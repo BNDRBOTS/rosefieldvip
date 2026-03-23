@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ROSE FIELD | VIP DRIP EDITION</title>
     <style>
         /* 💎 QUANTUM-VERSACE CSS DRIP 💎 */
@@ -11,21 +11,27 @@
             --rose: #c93a6c;
             --gold: #e0a96d;
         }
-        body, html { margin: 0; padding: 0; width: 100dvw; height: 100dvh; background-color: #0d0208; overflow: hidden; touch-action: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-user-select: none; }
+        body, html { 
+            margin: 0; padding: 0; width: 100dvw; height: 100dvh; 
+            background-color: #0d0208; overflow: hidden; touch-action: none; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            user-select: none; -webkit-user-select: none; 
+            -webkit-tap-highlight-color: transparent; /* NO CHEAP GREY BOXES ALOWED IN THE VIP */
+        }
         
         #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        canvas { display: block; width: 100%; height: 100%; }
+        canvas { display: block; width: 100%; height: 100%; -webkit-tap-highlight-color: transparent; }
         
         /* THE PLATINUM GATES (UI) */
         #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle at center, rgba(26,5,16,0.7) 0%, rgba(13,2,8,0.95) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 2.5s; }
         
         .title { color: transparent; font-size: 2.5rem; letter-spacing: 0.8rem; font-weight: 200; margin-bottom: 2rem; background: linear-gradient(45deg, var(--rose), var(--gold), #fff); -webkit-background-clip: text; background-clip: text; animation: shimmerText 4s infinite linear; text-align: center; }
         
-        .subtitle { color: var(--gold); font-size: 0.9rem; letter-spacing: 0.3rem; font-weight: 300; opacity: 0.8; padding: 15px 30px; border: 1px solid rgba(224, 169, 109, 0.2); border-radius: 50px; cursor: pointer; transition: all 0.4s ease; text-transform: uppercase; background: rgba(224, 169, 109, 0.05); }
+        .subtitle { color: var(--gold); font-size: 0.9rem; letter-spacing: 0.3rem; font-weight: 300; opacity: 0.8; padding: 15px 30px; border: 1px solid rgba(224, 169, 109, 0.2); border-radius: 50px; cursor: pointer; transition: all 0.4s ease; text-transform: uppercase; background: rgba(224, 169, 109, 0.05); -webkit-tap-highlight-color: transparent; outline: none; -webkit-appearance: none; appearance: none; }
         .subtitle:active { transform: scale(0.95); background: rgba(224, 169, 109, 0.2); box-shadow: 0 0 20px rgba(224, 169, 109, 0.4); }
         .subtitle:hover { background: rgba(224, 169, 109, 0.1); }
         
-        #mute-btn { position: absolute; bottom: env(safe-area-inset-bottom, 30px); right: 30px; z-index: 20; background: rgba(26,5,16,0.5); border: 1px solid rgba(224, 169, 109, 0.3); color: var(--gold); border-radius: 50%; width: 54px; height: 54px; font-size: 1.2rem; cursor: pointer; display: none; transition: all 0.3s ease; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; animation: fadeInUI 2s ease forwards 2.5s; }
+        #mute-btn { position: absolute; bottom: env(safe-area-inset-bottom, 30px); right: 30px; z-index: 20; background: rgba(26,5,16,0.5); border: 1px solid rgba(224, 169, 109, 0.3); color: var(--gold); border-radius: 50%; width: 54px; height: 54px; font-size: 1.2rem; cursor: pointer; display: none; transition: all 0.3s ease; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; animation: fadeInUI 2s ease forwards 2.5s; -webkit-tap-highlight-color: transparent; outline: none; -webkit-appearance: none; appearance: none; }
         
         #fallback { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; display: none; background: radial-gradient(circle at center, #3a0a1d 0%, #0d0208 100%); }
         .css-bloom { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vw; border-radius: 50%; background: radial-gradient(circle, rgba(201, 58, 108, 0.3) 0%, transparent 70%); animation: breath 10s infinite alternate ease-in-out; mix-blend-mode: screen; }
