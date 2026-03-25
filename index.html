@@ -75,71 +75,96 @@
         let touchActiveTarget = 0.0;
         let touchActiveCurrent = 0.0;
 
-        // --- 🚀 LEVEL 2 AUDIO ENGINE: AURA-FLEX RESONANCE 🚀 ---
+        // --- 🚀 LEVEL 3 AUDIO ENGINE: LIQUID VELVET RESONANCE 🚀 ---
         function initAudio() {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
             
+            // 💎 THE MILLION DOLLAR COMPRESSOR (Prevents ear-bleeding)
+            const compressor = audioCtx.createDynamicsCompressor();
+            compressor.threshold.value = -20;
+            compressor.knee.value = 30;
+            compressor.ratio.value = 12;
+            compressor.attack.value = 0.01;
+            compressor.release.value = 0.25;
+            compressor.connect(audioCtx.destination);
+
             masterGain = audioCtx.createGain();
             masterGain.gain.value = 0;
-            masterGain.connect(audioCtx.destination);
+            masterGain.connect(compressor);
 
-            // The Diamond Filter - Opens up on touch
+            // 💎 INFINITE SPA DELAY NETWORK (Lush Reverb)
+            const delay = audioCtx.createDelay(3.0);
+            delay.delayTime.value = 1.2;
+            const feedback = audioCtx.createGain();
+            feedback.gain.value = 0.35;
+            const delayFilter = audioCtx.createBiquadFilter();
+            delayFilter.type = 'lowpass';
+            delayFilter.frequency.value = 800;
+
+            delay.connect(feedback);
+            feedback.connect(delayFilter);
+            delayFilter.connect(delay);
+            delay.connect(masterGain);
+
+            // The Diamond Filter - Starts deep and muffled
             filterNode = audioCtx.createBiquadFilter();
             filterNode.type = 'lowpass';
-            filterNode.frequency.value = 800; // Base warmth
-            filterNode.Q.value = 1.2;
+            filterNode.frequency.value = 300; // Deep, oceanic warmth
+            filterNode.Q.value = 0.5;
             filterNode.connect(masterGain);
+            filterNode.connect(delay);
             
-            // LFO for slow breath (VCA)
+            // VCA for breathing
+            const breathGain = audioCtx.createGain();
+            breathGain.gain.value = 0.6;
+            breathGain.connect(filterNode);
+
+            // LFO for slow breath
             const breathLFO = audioCtx.createOscillator();
             breathLFO.type = 'sine';
-            breathLFO.frequency.value = 0.03; // 33-second ultra-slow cycle
-            const breathGain = audioCtx.createGain();
-            breathLFO.connect(breathGain.gain);
-            breathGain.connect(filterNode);
+            breathLFO.frequency.value = 0.04;
+            const lfoScale = audioCtx.createGain();
+            lfoScale.gain.value = 0.4;
+            breathLFO.connect(lfoScale).connect(breathGain.gain);
             breathLFO.start();
 
-            // 1. The Anchor (639 Hz Heart Chakra)
-            const oscBase = audioCtx.createOscillator();
-            oscBase.type = 'sine';
-            oscBase.frequency.value = 639;
-            oscBase.connect(breathGain);
-            oscBase.start();
+            // HELPER: Gold-Plated Oscillator Generator
+            function makeOsc(freq, type, vol, pan) {
+                const osc = audioCtx.createOscillator();
+                osc.type = type;
+                osc.frequency.value = freq;
+                const g = audioCtx.createGain();
+                g.gain.value = vol;
+                osc.connect(g);
+                if (pan !== 0 && audioCtx.createStereoPanner) {
+                    const p = audioCtx.createStereoPanner();
+                    p.pan.value = pan;
+                    g.connect(p).connect(breathGain);
+                } else {
+                    g.connect(breathGain);
+                }
+                osc.start();
+            }
 
-            // 2. The Width (Binaural offset for thickness)
-            const oscLeft = audioCtx.createOscillator();
-            oscLeft.type = 'sine';
-            oscLeft.frequency.value = 635;
-            const pannerLeft = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : audioCtx.createPanner();
-            if(pannerLeft.pan) pannerLeft.pan.value = -0.8;
-            oscLeft.connect(pannerLeft).connect(breathGain);
-            oscLeft.start();
+            // 1. LIQUID SUB-BASS (159.75 Hz)
+            makeOsc(159.75, 'sine', 1.0, 0);
+            // 2. The Anchor (639 Hz)
+            makeOsc(639, 'sine', 0.25, 0);
+            // 3. Binaural Width
+            makeOsc(635, 'sine', 0.15, -0.7);
+            makeOsc(643, 'sine', 0.15, 0.7);
+            // 4. Harmonic Gold Trim (958.5 Hz - Perfect Fifth)
+            makeOsc(958.5, 'sine', 0.1, 0);
 
-            const oscRight = audioCtx.createOscillator();
-            oscRight.type = 'sine';
-            oscRight.frequency.value = 643;
-            const pannerRight = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : audioCtx.createPanner();
-            if(pannerRight.pan) pannerRight.pan.value = 0.8;
-            oscRight.connect(pannerRight).connect(breathGain);
-            oscRight.start();
-
-            // 3. The Gold Trim (Warm Harmonic)
-            const oscHarmonic = audioCtx.createOscillator();
-            oscHarmonic.type = 'triangle';
-            oscHarmonic.frequency.value = 1278; // 639 * 2
-            const harmGain = audioCtx.createGain();
-            harmGain.gain.value = 0.08;
-            oscHarmonic.connect(harmGain).connect(breathGain);
-            oscHarmonic.start();
-
-            // 4. The Crystal Touch (Activates on touch)
+            // 5. The Crystal Touch 
             const oscCrystal = audioCtx.createOscillator();
             oscCrystal.type = 'sine';
-            oscCrystal.frequency.value = 2556; // High shimmer
+            oscCrystal.frequency.value = 1278; 
             crystalGain = audioCtx.createGain();
-            crystalGain.gain.value = 0.0; // Silent until touched
-            oscCrystal.connect(crystalGain).connect(masterGain); // Bypasses the lowpass filter
+            crystalGain.gain.value = 0.0;
+            oscCrystal.connect(crystalGain).connect(masterGain); 
+            crystalGain.connect(delay);
             oscCrystal.start();
 
             // Fade in the master
@@ -318,10 +343,10 @@
                 
                 // Map touch to audio parameters dynamically if audio is active
                 if(audioCtx && filterNode && crystalGain) {
-                    const baseFreq = 800;
-                    const maxFreq = 3000;
+                    const baseFreq = 300; // DROPPED FOR VELVET WARMTH
+                    const maxFreq = 1600; // CAPPED HIGHS
                     filterNode.frequency.setTargetAtTime(baseFreq + (maxFreq - baseFreq) * touchActiveCurrent, audioCtx.currentTime, 0.1);
-                    crystalGain.gain.setTargetAtTime(0.05 * touchActiveCurrent, audioCtx.currentTime, 0.1);
+                    crystalGain.gain.setTargetAtTime(0.15 * touchActiveCurrent, audioCtx.currentTime, 0.1);
                 }
                 
                 gl.uniform1f(timeLoc, (Date.now() - startTime) / 1000.0);
